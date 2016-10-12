@@ -1,0 +1,31 @@
+wb = xlsx_package.workbook
+wb.styles do |style|
+ highlight_cell = style.add_style(bg_color: "EFC376",
+                                   border: Axlsx::STYLE_THIN_BORDER,
+                                   alignment: { horizontal: :center },
+                                   num_fmt: 8)
+
+
+ date_cell = style.add_style(format_code: "yyyy-mm-dd", border: Axlsx::STYLE_THIN_BORDER)
+
+  wb.add_worksheet(name: "Products") do |sheet|
+     sheet.add_row ["Name", "Description", "Created At"]
+
+      sheet.merge_cells "A1:A2"
+      sheet.merge_cells "B1:B2"
+      sheet.merge_cells "C1:C2"
+      sheet.merge_cells "A1:B2"
+      sheet.merge_cells "A3:B3"
+
+      sheet.merge_cells sheet.rows.last.cells[(3..4)]
+
+     @products.each do |product|
+  	 #sheet.merge_cells "A1:B1"
+     sheet.add_row [product.name, product.desc, product.created_at], style: [nil, highlight_cell, date_cell]
+     sheet.add_hyperlink location: url_for(action: "show", id: product.id, only_path: false),ref: sheet.rows.last.cells.first
+     sheet.add_hyperlink location: "'Another Sheet'!B2", ref: sheet.rows.last.cells.first, target: :sheet
+    end
+    sheet.add_row ['Total', "=SUM(B1:B#{@products.length})"]
+   
+  end
+end
